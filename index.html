@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>V2Ray Decoder</title>
 
-  <!-- Roboto Font & Material Icons -->
+  <!-- Font & Icons -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -109,7 +109,6 @@
       white-space: pre-wrap;
     }
 
-
     .qr-section {
       margin-top: 2rem;
       background: #f8f9fa;
@@ -199,7 +198,7 @@
   <!-- Toast -->
   <div id="toast" class="toast">✅ Copied!</div>
 
-  <!-- JavaScript -->
+  <!-- JavaScript Logic -->
   <script>
     const urlInput = document.getElementById("urlInput");
     const btn = document.getElementById("submitBtn");
@@ -266,7 +265,6 @@
       return box;
     }
 
-    // Paste from clipboard
     function pasteClipboard() {
       navigator.clipboard.readText().then(text => {
         urlInput.value = text;
@@ -293,6 +291,7 @@
         const clean = sanitize(decoded);
         const configs = extractConfigs(clean);
 
+        // Subscription QR
         const qrSub = document.createElement("div");
         qrSub.className = "qr-section";
         qrSub.innerHTML = `<div class="qr-title">📡 Subscription Link</div>`;
@@ -300,12 +299,21 @@
         qrSub.onclick = () => navigator.clipboard.writeText(url).then(() => showToast("Subscription copied"));
         resultArea.appendChild(qrSub);
 
+        // Output block
         const output = document.createElement("div");
         output.className = "output";
         output.innerText = clean;
         output.onclick = () => navigator.clipboard.writeText(clean).then(() => showToast("All configs copied"));
         resultArea.appendChild(output);
 
+        // NEW: QR for entire text block
+        const qrAll = document.createElement("div");
+        qrAll.className = "qr-section";
+        qrAll.innerHTML = `<div class="qr-title">📄 Full Config QR</div>`;
+        qrAll.appendChild(createQR(clean, "All Configs"));
+        resultArea.appendChild(qrAll);
+
+        // Per config QR codes
         const qrGroup = document.createElement("div");
         qrGroup.className = "qr-section";
         qrGroup.innerHTML = `<div class="qr-title">🔐 Config QR Codes</div>`;
