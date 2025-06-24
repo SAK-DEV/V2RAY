@@ -306,10 +306,10 @@
         output.onclick = () => navigator.clipboard.writeText(clean).then(() => showToast("All configs copied"));
         resultArea.appendChild(output);
 
-        // NEW: QR for entire text block
+        // NEW: QR for all decoded text
         const qrAll = document.createElement("div");
         qrAll.className = "qr-section";
-        qrAll.innerHTML = `<div class="qr-title">📄 Full Config QR</div>`;
+        qrAll.innerHTML = `<div class="qr-title">📄 Combined Configs</div>`;
         qrAll.appendChild(createQR(clean, "All Configs"));
         resultArea.appendChild(qrAll);
 
