@@ -176,7 +176,6 @@
   <div class="app-container">
     <h1>V2Ray Config Decoder</h1>
 
-    <!-- Input + Paste + Submit -->
     <div class="form-group">
       <div class="input-wrap">
         <input id="urlInput" type="text" placeholder="Paste base64 subscription URL here" />
@@ -188,17 +187,13 @@
       </button>
     </div>
 
-    <!-- Error -->
     <div id="errorBox" class="error-box" style="display:none;"></div>
 
-    <!-- Results -->
     <div id="resultArea"></div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast">✅ Copied!</div>
 
-  <!-- JavaScript Logic -->
   <script>
     const urlInput = document.getElementById("urlInput");
     const btn = document.getElementById("submitBtn");
@@ -299,21 +294,21 @@
         qrSub.onclick = () => navigator.clipboard.writeText(url).then(() => showToast("Subscription copied"));
         resultArea.appendChild(qrSub);
 
-        // Output block
+        // Combined configs (QR + full text)
+        const combined = document.createElement("div");
+        combined.className = "qr-section";
+        combined.innerHTML = `<div class="qr-title">📄 Combined Configs</div>`;
+        combined.appendChild(createQR(clean, "All Configs"));
+
         const output = document.createElement("div");
         output.className = "output";
         output.innerText = clean;
         output.onclick = () => navigator.clipboard.writeText(clean).then(() => showToast("All configs copied"));
-        resultArea.appendChild(output);
+        combined.appendChild(output);
 
-        // NEW: QR for all decoded text
-        const qrAll = document.createElement("div");
-        qrAll.className = "qr-section";
-        qrAll.innerHTML = `<div class="qr-title">📄 Combined Configs</div>`;
-        qrAll.appendChild(createQR(clean, "All Configs"));
-        resultArea.appendChild(qrAll);
+        resultArea.appendChild(combined);
 
-        // Per config QR codes
+        // Per config QR
         const qrGroup = document.createElement("div");
         qrGroup.className = "qr-section";
         qrGroup.innerHTML = `<div class="qr-title">🔐 Config QR Codes</div>`;
