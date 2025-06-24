@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>V2Ray Config Decoder</title>
 
-  <!-- Material font and icons -->
+  <!-- Material Design fonts and icons -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  <!-- Styles (Do not change per user request) -->
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -31,18 +30,19 @@
       color: #4caf50;
     }
     form {
+      margin: 0;
+      padding: 0;
       display: flex;
+      flex-direction: column;
       gap: 1rem;
-      margin: 0 -1rem;
-      padding: 0 1rem;
-      align-items: center;
     }
     input[type="text"] {
-      flex: 1;
+      width: 100%;
       padding: 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 1rem;
+      box-sizing: border-box;
     }
     button {
       background: #4caf50;
@@ -52,10 +52,10 @@
       border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      white-space: nowrap;
+      align-self: center;
     }
     button.fetching {
       background: #ff9800;
@@ -132,7 +132,7 @@
   <div class="container">
     <h1>V2Ray Config Decoder</h1>
 
-    <!-- Input form -->
+    <!-- Input field + submit button -->
     <form id="mainForm">
       <input type="text" id="urlInput" placeholder="Paste Base64 URL here..." required>
       <button type="submit" id="submitBtn">
@@ -141,14 +141,14 @@
       </button>
     </form>
 
-    <!-- Error message -->
+    <!-- Area for error message -->
     <div id="errorBox" class="error-box" style="display:none"></div>
 
-    <!-- Results will be shown here -->
+    <!-- Area for results -->
     <div id="resultArea"></div>
   </div>
 
-  <!-- Toast notification -->
+  <!-- Toast message -->
   <div id="toast" class="toast">✅ Copied!</div>
 
   <!-- JavaScript -->
@@ -161,19 +161,19 @@
     const resultArea = document.getElementById("resultArea");
     const errorBox = document.getElementById("errorBox");
 
-    // Removes invisible unicode characters
+    // Sanitize text: remove hidden Unicode characters like RTL markers
     function sanitize(text) {
       return text.replace(/[\u200E\u200F\u202E]/g, '');
     }
 
-    // Decodes base64 string to UTF-8 text (for proper emoji rendering)
+    // Decode Base64 string as UTF-8 text using TextDecoder
     function decodeBase64Utf8(base64) {
       const binary = atob(base64);
       const bytes = new Uint8Array([...binary].map(ch => ch.charCodeAt(0)));
       return new TextDecoder("utf-8").decode(bytes);
     }
 
-    // Splits decoded block into multiple config strings
+    // Extract multiple configs from full block
     function extractConfigs(text) {
       const lines = text.split(/\r?\n/);
       const result = [];
@@ -192,14 +192,14 @@
       return result.map(sanitize);
     }
 
-    // Shows toast message
+    // Show Material-style toast message
     function showToast(msg = "✅ Copied!") {
       toast.innerText = msg;
       toast.classList.add("show");
       setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
-    // Creates a QR element with clickable image and copy text
+    // Create a QR + text block for a config link
     function createQR(link, label = "") {
       const qr = document.createElement("div");
       qr.className = "qr-box";
@@ -224,7 +224,7 @@
       return qr;
     }
 
-    // Form submission handler
+    // Handle form submit and main logic
     form.onsubmit = async e => {
       e.preventDefault();
       const url = urlInput.value.trim();
@@ -233,7 +233,7 @@
       resultArea.innerHTML = "";
       errorBox.style.display = "none";
 
-      // Change button state to loading
+      // Show loading state
       btn.classList.add("fetching");
       btnText.innerText = "Fetching... (click to cancel)";
       btn.onclick = () => location.reload();
@@ -245,12 +245,12 @@
         const json = await res.json();
         const base64 = json.contents.trim();
 
-        // Decode base64 with proper UTF-8 decoding
+        // Decode with UTF-8
         const decoded = decodeBase64Utf8(base64);
         const clean = sanitize(decoded);
         const configs = extractConfigs(clean);
 
-        // Show subscription QR
+        // Show QR for subscription link
         const qrSub = document.createElement("div");
         qrSub.className = "qr-section";
         qrSub.onclick = () => navigator.clipboard.writeText(url).then(() => showToast("Subscription link copied!"));
@@ -258,14 +258,14 @@
         qrSub.appendChild(createQR(url, url));
         resultArea.appendChild(qrSub);
 
-        // Show decoded block
+        // Show decoded full config block
         const output = document.createElement("div");
         output.className = "output";
         output.innerHTML = `<strong>🔓 Decoded Text (click to copy):</strong><pre>${clean}</pre>`;
         output.onclick = () => navigator.clipboard.writeText(clean).then(() => showToast("Config copied!"));
         resultArea.appendChild(output);
 
-        // Show QR for each config
+        // Show individual config QR codes
         const qrWrap = document.createElement("div");
         qrWrap.className = "qr-section";
         qrWrap.innerHTML = `<h2>📱 Config QR Codes</h2>`;
